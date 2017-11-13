@@ -20,3 +20,4 @@
 ## UI:
 
 - Bootstrap -> formatting
+- Add full_name method for users

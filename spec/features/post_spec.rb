@@ -2,28 +2,38 @@ require 'rails_helper'
 
 describe 'navigate' do
   before do
-    user = User.create(email: "test@test.com", password: "jason1", password_confirmation:      "jason1", first_name: "jon", last_name: "snow")
-    login_as(user, :scope => :user)
+    @user = FactoryGirl.create(:user)
+    login_as(@user, :scope => :user)
   end
+
   describe 'index' do
     before do
       visit posts_path
     end
+
     it 'can be reached successfully' do
       expect(page.status_code).to eq(200)
     end
 
-    # it 'has a title of Posts' do
-    #   visit posts_path
-    #   expect(page).to have_content(/Posts/)
-    # end
+    it 'has a title of Posts' do
+      expect(page).to have_content(/Posts/)
+    end
+
+    it 'has a list of posts' do
+      post1 = FactoryGirl.build_stubbed(:post)
+      post1 = FactoryGirl.build_stubbed(:second_post)
+      visit posts_path
+      expect(page).to have_content(/Rationale|content/)
+    end
   end
 
-  it 'has a list of posts' do
-    post1 = Post.create(date: Date.today, rationale: "Post1")
-    post2 = Post.create(date: Date.today, rationale: "Post2")
-    visit posts_path
-    page.find('body').text
+  describe 'new' do
+    it 'has a link from the hompage' do
+      visit root_path
+
+      click_link ("new_post_from_nav")
+      expect(page.status_code).to eq(200)
+    end
   end
 
   describe 'creation' do
@@ -37,10 +47,10 @@ describe 'navigate' do
 
     it 'can be created from new form page' do
       fill_in 'post[date]', with: Date.today
-      fill_in 'post[rationale]', with: "Some Rationale"
+      fill_in 'post[rationale]', with: "Some rationale"
       click_on "save"
 
-      expect(page).to have_content("Some Rationale")
+      expect(page).to have_content("Some rationale")
     end
 
     it 'will have a user associated with it' do
@@ -49,6 +59,29 @@ describe 'navigate' do
       click_on "save"
 
       expect(User.last.posts.last.rationale).to eq("User_Association")
+    end
+  end
+
+  describe 'edit' do
+    before do
+      @post = FactoryGirl.create(:post)
+    end
+
+    it 'can be reached by clicking edit on index page' do
+      visit posts_path
+
+      click_link ("edit_#{@post.id}")
+      expect(page.status_code).to eq(200)
+    end
+
+    it 'can be edited' do
+      visit edit_post_path(@post)
+
+      fill_in 'post[date]', with: date.today
+      fill_in 'post[rationale]', with: "Edited content"
+      click_on "save"
+
+      expect(page).to have_content("Edited content")
     end
   end
 end

@@ -25,7 +25,7 @@ class PostsController < ApplicationController
 
   def update
     if @post.update(post_params)
-      redirect_to @post, notice: 'Your post was created.'
+      redirect_to @post, notice: 'Your post was updated.'
     else
       render :edit
     end
@@ -36,7 +36,7 @@ class PostsController < ApplicationController
 
   def destroy
     @post.delete
-    redirect_to posts_path @post, notice: 'Your post has been obliterated.'
+    redirect_to posts_path, notice: 'Your post has been obliterated.'
   end
 
   private
